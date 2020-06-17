@@ -17,10 +17,10 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   Future getRate() async {
-    var coinRateData = await CoinData().getCoinData();
-    double rateInUSD = coinRateData['rate'];
+    var coinRateData = await CoinData().getCoinData(selectedCurrency);
+    double rate = coinRateData['rate'];
     setState(() {
-      coinValue = rateInUSD.round().toString();
+      coinValue = rate.round().toString();
     });
   }
 
@@ -36,6 +36,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value){
         setState(() {
           selectedCurrency = value;
+          getRate();
         });
       }
     );
@@ -51,7 +52,9 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 30.0, 
       onSelectedItemChanged: (selectedIndex) {
-        
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];  
+        });
       }, 
       children: pickerItems,
     );
@@ -78,7 +81,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $coinValue USD',
+                  '1 BTC = $coinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
