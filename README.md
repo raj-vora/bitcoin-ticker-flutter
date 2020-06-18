@@ -27,13 +27,13 @@ Use emulator or a physical device connected by USB
     $ flutter run
 ```
 
-# Note:  
-Make sure that device has an active internet connection.
-
 * Create APK
 ```sh
     $ flutter build apk --split-per-abi
 ```
+
+# Note:  
+Make sure that device has an active internet connection.
 
 ### Install for Android
 - [64 bit apk](https://www.github.com/raj-vora/bitcoin-ticker-flutter/blob/master/apks/bitcoin-ticker-arm64.apk?raw=true)
