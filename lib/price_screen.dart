@@ -9,7 +9,12 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency='USD', coinValue = '?';
+  String selectedCurrency='USD';
+  Map<String, String> prices = {
+    'BTC': '?',
+    'ETH': '?',
+    'LTC': '?'
+  };
 
   void initState() {
     super.initState();
@@ -17,11 +22,12 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   Future getRate() async {
-    var coinRateData = await CoinData().getCoinData(selectedCurrency);
-    double rate = coinRateData['rate'];
-    setState(() {
-      coinValue = rate.round().toString();
-    });
+    for(String crypto in cryptoList){
+      String price = await CoinData().getCoinData(selectedCurrency ,crypto);
+      setState(() {
+        prices[crypto] = price;
+      });
+    }
   }
 
   DropdownButton<String> androidDropdown() {
@@ -53,7 +59,8 @@ class _PriceScreenState extends State<PriceScreen> {
       itemExtent: 30.0, 
       onSelectedItemChanged: (selectedIndex) {
         setState(() {
-          selectedCurrency = currenciesList[selectedIndex];  
+          selectedCurrency = currenciesList[selectedIndex]; 
+          getRate(); 
         });
       }, 
       children: pickerItems,
@@ -70,26 +77,20 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $coinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          CryptoCard(
+            crypto: 'BTC',
+            coinValue: prices['BTC'], 
+            selectedCurrency: selectedCurrency
+          ),
+          CryptoCard(
+            crypto: 'ETH',
+            coinValue: prices['ETH'], 
+            selectedCurrency: selectedCurrency
+          ),
+          CryptoCard(
+            crypto: 'LTC',
+            coinValue: prices['LTC'], 
+            selectedCurrency: selectedCurrency
           ),
           Container(
             height: 150.0,
@@ -99,6 +100,37 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isIOS ? iOSPicker() : androidDropdown(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget { 
+  final String coinValue, selectedCurrency, crypto;
+
+  CryptoCard({@required this.crypto, @required this.coinValue, @required this.selectedCurrency});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $crypto = $coinValue $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
